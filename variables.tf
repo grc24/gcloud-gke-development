@@ -42,6 +42,7 @@ variable "gcp_region" {
 variable "subnetwork" {
   type        = string
   description = "(Required) Network to deploy"
+  default     = "10.10.0.0/24"
 }
 
 
