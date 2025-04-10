@@ -32,8 +32,9 @@ resource "tfe_oauth_client" "github" {
 
 ### Gcloud 
 provider "google" {
-  project = var.project_id
-  region  = var.gcp_region
+  project     = var.project_id
+  region      = var.gcp_region
+  credentials = var.GOOGLE_CREDENTIALS
 }
 
 # VPC

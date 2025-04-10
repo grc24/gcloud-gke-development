@@ -56,3 +56,7 @@ variable "gke_version_prefix" {
   description = "GKE Version"
   default     = "1.27."
 }
+
+variable "GOOGLE_CREDENTIALS" {
+  description = "Google Credentials"
+}
