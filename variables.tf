@@ -22,5 +22,5 @@ variable "organization" {
 variable "gh_pat" {
   type        = string
   description = "Github Personal Access Token"
-  sensitive = true
+  sensitive   = true
 }
