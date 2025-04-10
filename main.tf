@@ -16,7 +16,7 @@ resource "github_branch_default" "main" {
   branch     = github_branch.main.branch
 }
 
-### Terraform Ccloud configuration
+### Terraform Cloud configuration
 provider "tfe" {
   hostname = var.hostname
 }
