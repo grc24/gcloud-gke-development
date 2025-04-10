@@ -116,17 +116,16 @@ resource "google_container_cluster" "primary" {
     ]
   }
 }
-
 resource "google_container_node_pool" "primary_nodes" {
   name       = "primary-node-pool"
   location   = var.gcp_region
   cluster    = google_container_cluster.primary.name
-  node_count = 3
+  node_count = 2 # 👈 reduce number of nodes
 
   node_config {
-    machine_type = "e2-medium"
+    machine_type = "e2-small" # 👈 smaller CPU
     disk_type    = "pd-ssd"
-    disk_size_gb = 50
+    disk_size_gb = 50 # 👈 reduce disk size
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform",
     ]
@@ -137,6 +136,7 @@ resource "google_container_node_pool" "primary_nodes" {
     auto_repair  = true
   }
 }
+
 
 resource "null_resource" "delete_default_node_pool" {
   provisioner "local-exec" {
