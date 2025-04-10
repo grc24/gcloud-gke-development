@@ -59,5 +59,5 @@ variable "gke_version_prefix" {
 }
 
 variable "GOOGLE_CREDENTIALS" {
-  description = "Google Credentials"
+  description = "Google Credentials API"
 }
