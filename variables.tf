@@ -36,7 +36,7 @@ variable "project_id" {
 variable "gcp_region" {
   type        = string
   description = "(Required) GCP Region"
-  default     = "us-east1"
+  default     = "africa-south1"
 }
 
 variable "subnetwork" {
