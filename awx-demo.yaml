@@ -1,0 +1,311 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: awx
+    app.kubernetes.io/managed-by: awx-operator
+    app.kubernetes.io/operator-version: 2.7.2
+    app.kubernetes.io/part-of: awx-demo
+    app.kubernetes.io/version: 23.4.0
+  name: awx-demo-task
+  namespace: awx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: awx
+      app.kubernetes.io/managed-by: awx-operator
+      app.kubernetes.io/name: awx-demo-task
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum-configmaps-config: fc91b8700988040d7a2f8fa559115ae91346089d
+        checksum-configmaps-pre_stop_scripts: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
+        checksum-secret-bundle_cacert: da39a3ee5e6b4b0d3255bfef95601890afd80709
+        checksum-secret-ldap_cacert: da39a3ee5e6b4b0d3255bfef95601890afd80709
+        checksum-secret-receptor_ca: 4e3633270af540869d36ee033de39329cbe0e297
+        checksum-secret-receptor_work_signing: c1a06d2a0c540f1055f195bc92975d4316e12fbe
+        checksum-secret-route_tls: da39a3ee5e6b4b0d3255bfef95601890afd80709
+        checksum-secret-secret_key: 57c504548e41a147b4d103c75d151c4ccccd29f7
+        checksum-secrets-app_credentials: eadc327d51c1cd6a52e32739e86fa5ce5de15aa7
+        checksum-storage-persistent: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
+        kubectl.kubernetes.io/default-container: awx-demo-task
+      labels:
+        app.kubernetes.io/component: awx
+        app.kubernetes.io/managed-by: awx-operator
+        app.kubernetes.io/name: awx-demo-task
+        app.kubernetes.io/operator-version: 2.7.2
+        app.kubernetes.io/part-of: awx-demo
+        app.kubernetes.io/version: 23.4.0
+    spec:
+      containers:
+      - args:
+        - redis-server
+        - /etc/redis.conf
+        image: docker.io/redis:7
+        imagePullPolicy: IfNotPresent
+        name: redis
+        # resources:
+        #   requests:
+        #     cpu: 50m
+        #     memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/redis.conf
+          name: awx-demo-redis-config
+          readOnly: true
+          subPath: redis.conf
+        - mountPath: /var/run/redis
+          name: awx-demo-redis-socket
+        - mountPath: /data
+          name: awx-demo-redis-data
+      - args:
+        - /usr/bin/launch_awx_task.sh
+        env:
+        - name: AWX_COMPONENT
+          value: task
+        - name: SUPERVISOR_CONFIG_PATH
+          value: /etc/supervisord_task.conf
+        - name: AWX_SKIP_MIGRATIONS
+          value: "1"
+        - name: MY_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: quay.io/ansible/awx:23.4.0
+        imagePullPolicy: IfNotPresent
+        name: awx-demo-task
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/tower/conf.d/execution_environments.py
+          name: awx-demo-application-credentials
+          readOnly: true
+          subPath: execution_environments.py
+        - mountPath: /etc/tower/conf.d/credentials.py
+          name: awx-demo-application-credentials
+          readOnly: true
+          subPath: credentials.py
+        - mountPath: /etc/tower/conf.d/ldap.py
+          name: awx-demo-application-credentials
+          readOnly: true
+          subPath: ldap.py
+        - mountPath: /etc/tower/SECRET_KEY
+          name: awx-demo-secret-key
+          readOnly: true
+          subPath: SECRET_KEY
+        - mountPath: /etc/tower/settings.py
+          name: awx-demo-settings
+          readOnly: true
+          subPath: settings.py
+        - mountPath: /var/run/redis
+          name: awx-demo-redis-socket
+        - mountPath: /var/run/awx-rsyslog
+          name: rsyslog-socket
+        - mountPath: /etc/receptor/
+          name: awx-demo-receptor-config
+        - mountPath: /etc/receptor/work_private_key.pem
+          name: awx-demo-receptor-work-signing
+          readOnly: true
+          subPath: work-private-key.pem
+        - mountPath: /var/run/receptor
+          name: receptor-socket
+        - mountPath: /var/lib/awx/projects
+          name: awx-demo-projects
+      - args:
+        - /bin/sh
+        - -c
+        - |
+          if [ ! -f /etc/receptor/receptor.conf ]; then
+            cp /etc/receptor/receptor-default.conf /etc/receptor/receptor.conf
+            sed -i "s/HOSTNAME/$HOSTNAME/g" /etc/receptor/receptor.conf
+          fi
+          exec receptor --config /etc/receptor/receptor.conf
+        image: quay.io/ansible/awx-ee:latest
+        imagePullPolicy: IfNotPresent
+        name: awx-demo-ee
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/receptor/receptor-default.conf
+          name: awx-demo-default-receptor-config
+          subPath: receptor.conf
+        - mountPath: /etc/receptor/
+          name: awx-demo-receptor-config
+        - mountPath: /etc/receptor/tls/ca/mesh-CA.crt
+          name: awx-demo-receptor-ca
+          readOnly: true
+          subPath: tls.crt
+        - mountPath: /etc/receptor/work_private_key.pem
+          name: awx-demo-receptor-work-signing
+          readOnly: true
+          subPath: work-private-key.pem
+        - mountPath: /etc/receptor/tls/
+          name: awx-demo-receptor-tls
+        - mountPath: /var/run/receptor
+          name: receptor-socket
+        - mountPath: /var/lib/awx/projects
+          name: awx-demo-projects
+      - args:
+        - /usr/bin/launch_awx_rsyslog.sh
+        env:
+        - name: SUPERVISOR_CONFIG_PATH
+          value: /etc/supervisord_rsyslog.conf
+        image: quay.io/ansible/awx:23.4.0
+        imagePullPolicy: IfNotPresent
+        name: awx-demo-rsyslog
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/tower/conf.d/credentials.py
+          name: awx-demo-application-credentials
+          readOnly: true
+          subPath: credentials.py
+        - mountPath: /etc/tower/SECRET_KEY
+          name: awx-demo-secret-key
+          readOnly: true
+          subPath: SECRET_KEY
+        - mountPath: /etc/tower/settings.py
+          name: awx-demo-settings
+          readOnly: true
+          subPath: settings.py
+        - mountPath: /var/run/redis
+          name: awx-demo-redis-socket
+        - mountPath: /var/run/awx-rsyslog
+          name: rsyslog-socket
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          hostname=$MY_POD_NAME
+          receptor --cert-makereq bits=2048 commonname=$hostname dnsname=$hostname nodeid=$hostname outreq=/etc/receptor/tls/receptor.req outkey=/etc/receptor/tls/receptor.key
+          receptor --cert-signreq req=/etc/receptor/tls/receptor.req cacert=/etc/receptor/tls/ca/mesh-CA.crt cakey=/etc/receptor/tls/ca/mesh-CA.key outcert=/etc/receptor/tls/receptor.crt verify=yes
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        image: quay.io/ansible/awx-ee:latest
+        imagePullPolicy: IfNotPresent
+        name: init
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/receptor/tls/ca/mesh-CA.crt
+          name: awx-demo-receptor-ca
+          readOnly: true
+          subPath: tls.crt
+        - mountPath: /etc/receptor/tls/ca/mesh-CA.key
+          name: awx-demo-receptor-ca
+          readOnly: true
+          subPath: tls.key
+        - mountPath: /etc/receptor/tls/
+          name: awx-demo-receptor-tls
+      restartPolicy: Always
+      serviceAccount: awx-demo
+      serviceAccountName: awx-demo
+      volumes:
+      - name: awx-demo-application-credentials
+        secret:
+          defaultMode: 420
+          items:
+          - key: credentials.py
+            path: credentials.py
+          - key: ldap.py
+            path: ldap.py
+          - key: execution_environments.py
+            path: execution_environments.py
+          secretName: awx-demo-app-credentials
+      - emptyDir: {}
+        name: awx-demo-receptor-tls
+      - name: awx-demo-receptor-ca
+        secret:
+          defaultMode: 420
+          secretName: awx-demo-receptor-ca
+      - name: awx-demo-receptor-work-signing
+        secret:
+          defaultMode: 420
+          secretName: awx-demo-receptor-work-signing
+      - name: awx-demo-secret-key
+        secret:
+          defaultMode: 420
+          items:
+          - key: secret_key
+            path: SECRET_KEY
+          secretName: awx-demo-secret-key
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: settings
+            path: settings.py
+          name: awx-demo-awx-configmap
+        name: awx-demo-settings
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: nginx_conf
+            path: nginx.conf
+          name: awx-demo-awx-configmap
+        name: awx-demo-nginx-conf
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: redis_conf
+            path: redis.conf
+          name: awx-demo-awx-configmap
+        name: awx-demo-redis-config
+      - emptyDir: {}
+        name: awx-demo-redis-socket
+      - emptyDir: {}
+        name: awx-demo-redis-data
+      - emptyDir: {}
+        name: rsyslog-socket
+      - emptyDir: {}
+        name: receptor-socket
+      - emptyDir: {}
+        name: awx-demo-receptor-config
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: receptor_conf
+            path: receptor.conf
+          name: awx-demo-awx-configmap
+        name: awx-demo-default-receptor-config
+      - emptyDir: {}
+        name: awx-demo-projects
