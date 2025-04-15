@@ -54,4 +54,4 @@ jobs:
     # Run a terrafrom plan
     - name: Terraform Plan
       id: plan
-      run: terraform plan  -var="tfe_token=${{ secrets.TFE_TOKEN }}"-var="gh_pat=${{ secrets.GH_PAT }}" -input=false -out=tfplan
+      run: terraform plan  -var="tfe_token=${{ secrets.TFE_TOKEN }}" -var="gh_pat=${{ secrets.GH_PAT }}" -input=false -out=tfplan
