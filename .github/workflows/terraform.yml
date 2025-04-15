@@ -42,3 +42,7 @@ jobs:
       id: validate
       if: (success() || failure())
       run: terraform validate
+    # Run a terrafrom plan
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -out=tfplan
