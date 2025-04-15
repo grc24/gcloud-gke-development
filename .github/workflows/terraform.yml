@@ -9,7 +9,7 @@ env:
 jobs:
   terraform:
     name: 'Terraform'
-    runs-on: ubuntu-
+    runs-on: ubuntu-latest
     
     # Set the environment variables for the GitHub Actions runner
     env:
@@ -33,6 +33,7 @@ jobs:
     - name: Terraform Init
       id: init
       run: terraform init
+
 
 
     # Run a terraform fmt for push
