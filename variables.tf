@@ -6,11 +6,11 @@ variable "repository_name" {
 variable "hostname" {
   type        = string
   description = "The Terraform Cloud/Enterprise hostname to connect to"
-  default = "app.terraform.io"
+  default     = "app.terraform.io"
 }
 
 variable "oauth_name" {
-  type = string
+  type    = string
   default = "tdd-github"
 }
 
@@ -20,6 +20,6 @@ variable "organization" {
 }
 
 variable "gh_pat" {
-  type = string 
+  type        = string
   description = "Github Personal Access Token"
 }
