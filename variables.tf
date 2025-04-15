@@ -1,31 +1,3 @@
-variable "repository_name" {
-  default     = "gcloud-gke-development"
-  description = "Name of repository for gke"
-  type        = string
-}
-variable "hostname" {
-  type        = string
-  description = "The Terraform Cloud/Enterprise hostname to connect to"
-  default     = "app.terraform.io"
-}
-
-variable "oauth_name" {
-  type    = string
-  default = "tdd-github"
-}
-
-variable "organization" {
-  type        = string
-  description = "Terraform  Cloud Organization"
-}
-
-variable "gh_pat" {
-  type        = string
-  description = "Github Personal Access Token"
-  sensitive   = true
-}
-
-
 ##### GCP CLOUD
 variable "project_id" {
   type        = string
@@ -45,12 +17,10 @@ variable "subnetwork" {
   default     = "10.10.0.0/24"
 }
 
-
 variable "gke_num_nodes" {
   default     = 2
   description = "number of gke nodes"
 }
-
 
 variable "gke_version_prefix" {
   type        = string
