@@ -9,8 +9,11 @@ env:
 jobs:
   terraform:
     name: 'Terraform'
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-
+    
+    # Set the environment variables for the GitHub Actions runner
+    env:
+      TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
     # Use the Bash shell regardless whether the GitHub Actions runner is 
     # ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -29,11 +32,7 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
-      env:
-        TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
-      run: |
-        terraform login -no-color
-        terraform init
+      run: terraform init
 
 
     # Run a terraform fmt for push
@@ -52,4 +51,4 @@ jobs:
     # Run a terrafrom plan
     - name: Terraform Plan
       id: plan
-      run: terraform plan -var="gh_pat=${{ secrets.GH_PAT }}"  --out=tfplan
+      run: terraform plan -input=false -out=tfplan
