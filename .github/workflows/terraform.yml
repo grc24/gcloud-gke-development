@@ -43,11 +43,7 @@ jobs:
       if: (success() || failure())
       run: terraform validate
     
-    # Run a terraform init
-    - name: Terraform Init
-      id: init
-      run: terraform init
-      
+
     # Run a terrafrom plan
     - name: Terraform Plan
       id: plan
