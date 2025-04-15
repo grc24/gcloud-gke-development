@@ -31,7 +31,7 @@ resource "google_container_cluster" "primary" {
   location = var.gcp_region
 
   initial_node_count = 1
-  # deletion_protection is not supported in google_container_cluster
+
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
 
