@@ -24,3 +24,7 @@ variable "gh_pat" {
   type        = string
   description = "Github Personal Access Token"
 }
+variable "tfe_token" {
+  type = string
+  description = "Terraform Cloud Token"
+}

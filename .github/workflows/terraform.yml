@@ -14,6 +14,8 @@ jobs:
     # Set the environment variables for the GitHub Actions runner
     env:
       TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
+      #TFE_ORG: ${{ secrets.TFE_ORG }}
+
     # Use the Bash shell regardless whether the GitHub Actions runner is 
     # ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -52,4 +54,4 @@ jobs:
     # Run a terrafrom plan
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -out=tfplan
+      run: terraform plan -var="gh_pat=${{ secrets.GH_PAT }}" -input=false -out=tfplan

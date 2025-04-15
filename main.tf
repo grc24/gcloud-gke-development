@@ -19,7 +19,7 @@ resource "github_branch_default" "main" {
 ### Terraform Ccloud configuration
 provider "tfe" {
   hostname = var.hostname
-  token    = var.gh_pat
+  token    = var.tfe_token
 }
 
 resource "tfe_oauth_client" "github" {
