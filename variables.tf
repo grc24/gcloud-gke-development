@@ -17,6 +17,7 @@ variable "oauth_name" {
 variable "organization" {
   type        = string
   description = "Terraform  Cloud Organization"
+  default     = "aws_david_20"
 }
 
 variable "gh_pat" {
