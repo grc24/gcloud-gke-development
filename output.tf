@@ -1,11 +1,11 @@
 output "kubernetes_cluster_name" {
   value       = google_container_cluster.primary.name
   description = "GKE Cluster Name"
-  #sensitive   = true
+  sensitive   = true
 }
 
 output "kubernetes_cluster_host" {
   value       = google_container_cluster.primary.endpoint
   description = "GKE Cluster Host"
-  #sensitive   = true
+  sensitive   = true
 }
