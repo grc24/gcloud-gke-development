@@ -27,6 +27,14 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
+    # Login to Terraform Cloud or Terraform Enterprise
+    - name: Terraform Login
+      id: login
+      env:
+      # Set the TF_TOKEN environment variable for Terraform Cloud or Terraform Enterprise
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+      run: terraform login
+      
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
