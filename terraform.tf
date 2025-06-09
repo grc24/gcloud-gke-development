@@ -1,12 +1,12 @@
 terraform {
-  cloud {
+  /* cloud {
     # Organization ID
     organization = "aws_david_20"
     # Workspace ID
     workspaces {
       name = "gcloud-gke-development"
     }
-  }
+  } */
   required_providers {
     github = {
       source  = "integrations/github"
