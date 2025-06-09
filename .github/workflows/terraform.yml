@@ -41,7 +41,11 @@ jobs:
         EOF
 
     - name: Terraform Init
-      run: terraform init -input=false
+      env:
+        # for app.terraform.io, Terraform will look for TF_TOKEN_app_terraform_io
+        TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN }}
+      run: terraform init -input=false -no-color
+
 
     # …follow with plan/apply steps as usual
 
