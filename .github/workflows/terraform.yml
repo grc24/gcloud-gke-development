@@ -5,6 +5,7 @@ on: push
 env:
   TF_LOG: INFO
   TF_INPUT: false
+  TF_TOKEN: ${{ secrets.TF_TOKEN }}
 
 jobs:
   terraform:
@@ -29,6 +30,9 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
+      env:
+      # Set the TF_TOKEN environment variable for Terraform Cloud or Terraform Enterprise
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
       run: terraform init
 
     # Run a terraform fmt for push
