@@ -27,21 +27,26 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # Login to Terraform Cloud or Terraform Enterprise
-    - name: Terraform Login
-      id: login
-      env:
-      # Set the TF_TOKEN environment variable for Terraform Cloud or Terraform Enterprise
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-      run: terraform login
-      
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Configure Terraform credentials
+      run: |
+        mkdir -p ~/.terraform.d
+        cat > ~/.terraform.d/credentials.tfrc.json <<EOF
+        {
+          "credentials": {
+            "app.terraform.io": {
+              "token": "${{ secrets.TF_TOKEN }}"
+            }
+          }
+        }
+        EOF
+
     - name: Terraform Init
       id: init
-      env:
-      # Set the TF_TOKEN environment variable for Terraform Cloud or Terraform Enterprise
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-      run: terraform init
+      # Initialize Terraform with no input
+      # This will download the required providers and modules
+      # It will also create the .terraform directory
+      run: terraform init -input=false
+
 
     # Run a terraform fmt for push
     - name: Terraform Format
