@@ -27,7 +27,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    - name: Configure Terraform credentials
+    - name: Configure Terraform Cloud credentials
       run: |
         mkdir -p ~/.terraform.d
         cat > ~/.terraform.d/credentials.tfrc.json <<EOF
@@ -41,11 +41,10 @@ jobs:
         EOF
 
     - name: Terraform Init
-      id: init
-      # Initialize Terraform with no input
-      # This will download the required providers and modules
-      # It will also create the .terraform directory
       run: terraform init -input=false
+
+    # …follow with plan/apply steps as usual
+
 
 
     # Run a terraform fmt for push
